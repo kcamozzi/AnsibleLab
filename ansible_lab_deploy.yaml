@@ -1,0 +1,40 @@
+---
+- name: Deploy Apache Webservers and change listening port
+  hosts: webservers
+  become: yes
+  tasks:
+    - name: install apache
+      apt: name=apache2 update_cache=yes state=latest
+
+    - name: enable mod_rewrite
+      apache2_module: name=rewrite state=present
+      notify:
+        - restart apache
+
+    - name: start apache
+      service: name=apache2 state=started
+
+    - name: apache2 listen on port 8080
+      lineinfile: dest=/etc/apache2/ports.conf regexp="^Listen 80" line="Listen 8080" state=present
+      notify:
+        - restart apache
+    - name: apache2 virtualhost on port 8080
+      lineinfile: dest=/etc/apache2/sites-available/000-default.conf regexp="^<VirtualHost \*:80>" line="<VirtualHost *:8081>" state=present
+      notify:
+        - restart apache
+
+    - name: update VM2 homepage
+      copy:
+        src: VM2.html
+        dest: /var/www/html/index.html
+        backup: yes
+      delegate_to: VM2
+    - name: update VM3 homepage
+      copy:
+        src: VM3.html
+        dest: /var/www/html/index.html
+        backup: yes
+      delegate_to: VM3
+  handlers:
+    - name: restart apache
+      service: name=apache2 state=restarted
