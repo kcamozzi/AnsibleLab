@@ -1,3 +1,11 @@
+# References
+#
+# Setting up apache server and changing listening ports:
+# https://www.bogotobogo.com/DevOps/Ansible/Ansible_SettingUp_Webservers_Apache.php
+#
+# Managing files (modifying/copying)
+# https://www.howtoforge.com/ansible-guide-manage-files-using-ansible/
+#
 ---
 - name: Un-deploying Apache Webserver
   hosts: webservers
